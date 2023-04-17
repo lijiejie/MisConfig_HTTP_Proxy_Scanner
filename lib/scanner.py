@@ -2,7 +2,7 @@ import asyncio
 import random
 import re
 import string
-import git .asyncresolver
+import dns.asyncresolver
 import wx
 import httpx
 import lib.common
