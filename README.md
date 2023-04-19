@@ -16,6 +16,10 @@ This app developed and tested with python3.8 only. Create a python3.8 virtual en
 pip3 install -r requirements.txt
 ```
 
+## ChangeLog
+
+* 2023-04-19: Fix vulnerability report panel sort bug. 
+
 ## How To Use
 
 For the left side input box, input some public IPs or domains that you find via brute / crawler / PassiveDNS etc.
