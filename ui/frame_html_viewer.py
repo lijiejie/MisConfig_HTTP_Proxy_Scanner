@@ -24,7 +24,6 @@ class ViewHTMLFrame(wx.Frame):
         self.Center(wx.BOTH)
 
     def show_source_code(self, protocol, ip_port, domain):
-        protocol = 'https' if protocol == 0 else 'http'
         self.url = "%s://%s" % (protocol, ip_port)
         self.domain = domain
 

@@ -164,7 +164,7 @@ async def do_proxy_scan_thread(app):
                     m = pattern_title.match(r.text)
                     title = m.group(1).strip() if m else r.text[:200].replace('\r', '').replace('\n', '')
                     show_log('[Vul] %s://%s:%s %s %s' % (info['protocol'], ip, port, domain, title))
-                    vul = (info['protocol'], ip + ':' + str(port), domain, str(r.status_code), title)
+                    vul = (ip + ':' + str(port), domain, str(r.status_code), title, info['protocol'])
                     wx.PostEvent(lib.common.REF_FRAME, VulEvent(vul=vul))
                 else:
                     if target not in false_positives:

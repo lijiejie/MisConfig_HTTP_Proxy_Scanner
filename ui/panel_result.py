@@ -19,6 +19,8 @@ class ResultPanel(wx.Panel, list_mix.ColumnSorterMixin):
         self.image_list = wx.ImageList(16, 16)
         self.img_0 = self.image_list.Add(wx.Image(get_abs_path("ui/ssl.png")).ConvertToBitmap())
         self.img_0 = self.image_list.Add(wx.Image(get_abs_path("ui/http.png")).ConvertToBitmap())
+        self.sort_up = self.image_list.Add(wx.Image(get_abs_path("ui/sort_up.png")).ConvertToBitmap())
+        self.sort_down = self.image_list.Add(wx.Image(get_abs_path("ui/sort_down.png")).ConvertToBitmap())
         self.list = VulnerabilityListCtrl(self, style=wx.LC_REPORT | wx.BORDER_SUNKEN | wx.LC_SORT_ASCENDING)
         self.list.SetImageList(self.image_list, wx.IMAGE_LIST_SMALL)
 
@@ -30,8 +32,8 @@ class ResultPanel(wx.Panel, list_mix.ColumnSorterMixin):
 
         self.populate_list()
 
-        list_mix.ColumnSorterMixin.__init__(self, 5)
-        self.SortListItems(2, False)
+        list_mix.ColumnSorterMixin.__init__(self, 4)
+        # self.SortListItems(2, False)
 
         self.SetSizer(sizer)
         self.SetAutoLayout(True)
@@ -55,27 +57,28 @@ class ResultPanel(wx.Panel, list_mix.ColumnSorterMixin):
         info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
         info.Image = -1
         info.Align = 0
-        info.Text = ""
-        self.list.InsertColumn(0, info)
         info.Text = "Target"
-        self.list.InsertColumn(1, info)
+        self.list.InsertColumn(0, info)
         info.Text = "Domain"
-        self.list.InsertColumn(2, info)
+        self.list.InsertColumn(1, info)
         info.Text = "Status"
-        self.list.InsertColumn(3, info)
+        self.list.InsertColumn(2, info)
         info.Text = "HTTP Title"
-        self.list.InsertColumn(4, info)
+        self.list.InsertColumn(3, info)
 
-        self.list.SetColumnWidth(0, 40)
-        self.list.SetColumnWidth(1, 130)
-        self.list.SetColumnWidth(2, 150)
-        self.list.SetColumnWidth(3, 60)
-        self.list.SetColumnWidth(4, 100)
+        self.list.SetColumnWidth(0, 130)
+        self.list.SetColumnWidth(1, 150)
+        self.list.SetColumnWidth(2, 60)
+        self.list.SetColumnWidth(3, 100)
         self.current_item = 0
 
     # Used by the ColumnSorterMixin
     def GetListCtrl(self):
         return self.list
+
+    # Used by the ColumnSorterMixin
+    def GetSortImages(self):
+        return self.sort_down, self.sort_up
 
     def get_column_text(self, index, col):
         item = self.list.GetItem(index, col)
@@ -97,9 +100,11 @@ class ResultPanel(wx.Panel, list_mix.ColumnSorterMixin):
         if self.list.GetItemCount() < 1:
             return
 
-        protocol = self.list.GetItemData(self.current_item)
-        ip_port = self.get_column_text(self.current_item, 1)
-        domain = self.get_column_text(self.current_item, 2)
+        idx = self.list.GetItemData(self.current_item)
+        data = self.itemDataMap[idx]
+        ip_port = data[0]
+        domain = data[1]
+        protocol = data[4]
         frame = ViewHTMLFrame(self)
         frame.show_source_code(protocol, ip_port, domain)
         frame.Center(wx.BOTH)
@@ -111,13 +116,12 @@ class ResultPanel(wx.Panel, list_mix.ColumnSorterMixin):
         self.view_source_code(None)
 
     def add_vulnerability(self, vul):
-        self.itemDataMap[self.list.GetItemCount()] = vul
-        index = self.list.InsertItem(self.list.GetItemCount(), 0 if vul[0] == 'https' else 1)
+        self.itemDataMap[self.list.GetItemCount()+1] = vul
+        index = self.list.InsertItem(self.list.GetItemCount(), vul[0], 0 if vul[4] == 'https' else 1)
         self.list.SetItem(index, 1, vul[1])
         self.list.SetItem(index, 2, vul[2])
         self.list.SetItem(index, 3, vul[3])
-        self.list.SetItem(index, 4, vul[4])
-        self.list.SetItemData(index, 0 if vul[0] == 'https' else 1)
+        self.list.SetItemData(index, self.list.GetItemCount())
 
 
 if __name__ == '__main__':
